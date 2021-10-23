@@ -1511,7 +1511,7 @@ var_dump($sohrab);
 var_dump($ali);
 ```
 
-
+![enter image description here](https://raw.githubusercontent.com/gitmag-group-admin/oop_php/main/02.png)
 ### Copying object using the clone keyword
 PHP provides you with the `clone` keyword that allows you to create a shallow copy of an object. For example:
 
@@ -1535,6 +1535,7 @@ var_dump($sohrab);
 var_dump($ali);
 ```
 
+![enter image description here](https://raw.githubusercontent.com/gitmag-group-admin/oop_php/main/03.png)
 
 
 ## Namespaces
