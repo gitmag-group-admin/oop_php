@@ -1538,6 +1538,73 @@ var_dump($ali);
 ```
 
 ![enter image description here](https://raw.githubusercontent.com/gitmag-group-admin/oop_php/main/03.png)
+### Compare Objects
+
+in this tutorial, you will learn how to compare objects in PHP using the comparison operator ( `==`) and identity operator (`===`).
+
+```php
+class Point
+{
+	private $x;
+	private $y;
+	
+	public function __construct($x, $y){
+		$this->x = $x;
+		$this->y = $y;
+	}
+}
+```
+When you compare objects using the comparison operator (`==`), two objects are equal if they are instances of the same class and have the same properties and values.
+
+```php
+$p1 = new Point(10, 20);
+$p2 = new Point(10, 20);
+
+if ($p1 == $p2) {
+	echo 'p1 and p2 are equal.';
+} else {
+	echo 'p1 and p2 are not equal.';
+}
+```
+It returns the following message:
+```php
+`p1 and p2 are equal`
+```
+
+When you use the identity operator (`===`) to compare objects, they are identical if and only if both of them reference the same instance of a class.
+
+```php
+$p1 = new Point(10, 20);
+$p2 = $p1;
+
+if ($p1 === $p2) {
+	echo 'p1 and p2 are identical.';
+} else {
+	echo 'p1 and p2 are not identical.';
+}
+```
+<table>
+	<tr>
+		<th>Criteria</th>
+		<th>==</th>
+		<th>===</th>
+	</tr>
+	<tr>
+		<td>Two objects reference the same instance</td>
+		<td>true</td>
+		<td>true</td>
+	</tr>
+	<tr>
+		<td>Objects with matching properties</td>
+		<td>true</td>
+		<td>false</td>
+	</tr>
+	<tr>
+		<td>Objects with different properties</td>
+		<td>false</td>
+		<td>false</td>
+	</tr>
+</table>
 
 
 ## Namespaces
