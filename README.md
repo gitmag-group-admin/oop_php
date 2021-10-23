@@ -41,7 +41,9 @@ Object-oriented programming has several advantages over procedural programming:
 Classes and objects are the two main aspects of object-oriented programming.
 Look at the following illustration to see the difference between class and objects:
 
+
 ![enter image description here](https://raw.githubusercontent.com/gitmag-group-admin/oop_php/main/01.jpg)
+
 So, a class is a template for objects, and an object is an instance of a class.
 
 When the individual objects are created, they inherit all the properties and behaviors from the class, but each object will have different values for the properties.
