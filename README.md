@@ -1,4 +1,4 @@
-# PHP OOP
+# OOP in PHP
 
  - What is OOP
  - Classes and Objects
@@ -41,12 +41,11 @@ Object-oriented programming has several advantages over procedural programming:
 Classes and objects are the two main aspects of object-oriented programming.
 Look at the following illustration to see the difference between class and objects:
 
-
-![enter image description here](https://raw.githubusercontent.com/gitmag-group-admin/oop_php/main/01.jpg)
-
 So, a class is a template for objects, and an object is an instance of a class.
 
 When the individual objects are created, they inherit all the properties and behaviors from the class, but each object will have different values for the properties.
+
+![enter image description here](https://raw.githubusercontent.com/gitmag-group-admin/oop_php/main/01.jpg)
 
 ## PHP OOP - Classes and Objects
 
@@ -76,10 +75,10 @@ class Car{
 	public $color;  
   
 	// Methods  
-	function decrease_speed() {  
+	public function decrease_speed() {  
 		echo "decrease speed";  
 	}  
-	function increase_speed() {  
+	public function increase_speed() {  
 		echo"increase speed";  
 	}  
 }
@@ -94,21 +93,8 @@ Objects of a class is created using the `new` keyword.
 In the example below, $bmw instance of the class Car:
 
 ```php
-class Car{  
-	// Properties  
-	public $brand;  
-	public $color;  
-  
-	// Methods  
-	function decrease_speed() {  
-		echo "decrease speed\n";  
-	}  
-	function increase_speed() {  
-		echo"increase speed\n";  
-	}  
-}  
-  
 $bmw = new Car();  
+
 $bmw->brand = 'bmw';  
 $bmw->color = 'red';  
   
@@ -129,6 +115,7 @@ Look at the following example:
 class Car{  
 	public $brand;  
 }  
+
 $benz = new Car();
 ```
 
@@ -137,7 +124,8 @@ Inside the class (by adding a set_name() method and use $this):
 ```php
 class Car{  
 	public $brand;  
-	function set_brand($brand) {  
+	
+	public function set_brand($brand) {  
 		$this->brand = $brand;  
 	}  
 }  
@@ -154,10 +142,11 @@ echo $bmw->brand;
 class Car{  
 	public $brand;  
 }  
-$bmw= new Fruit();  
-$apple->brand = "benz";  
+
+$bmw = new Car();  
+$bmw->brand = "benz";  
   
-echo $apple->brand;
+echo $bmw->brand;
 ```
 
 ### Chaining Methods
@@ -226,52 +215,139 @@ var_dump($bmw instanceof Car);
 
 ## Access Modifiers
 
-Properties and methods can have access modifiers which control where they can be accessed.
+### Introduction to PHP access modifiers
+In the objects and classes tutorial, you have learned about how to use the `public` access modifier with properties and methods.
 
-There are three access modifiers:
--   `public` - the property or method can be accessed from everywhere. This is default
--   `protected` - the property or method can be accessed within the class and by classes derived from that class
--   `private` - the property or method can ONLY be accessed within the class
+In fact, PHP has three access modifiers: `public`, `private`, and `protected`. In this tutorial, you’ll focus on the `public` and `private` access modifiers.
 
-In the following example we have added three different access modifiers to three properties (brand, color, and weight). Here, if you try to set the name property it will work fine (because the name property is public, and can be accessed from everywhere). However, if you try to set the color or weight property it will result in a fatal error (because the color and weight property are protected and private):
+-   The `public` access modifier allows you to access properties and methods from both inside and outside of the class.
+-   The `private` access modifier prevents you from accessing properties and methods from the outside of the class.
 
-```php
-class Car {  
-	public $brand;  
-	protected $color;  
-	private $type;  
-}  
-  
-$benz = new Car();  
-$benz->brand = 'benz'; // OK  
-$benz->color = 'yellow'; // ERROR  
-$benz->type = 'sedan'; // ERROR
-```
+### The public access modifier
+When you place the `public` keyword in front of a property or a method, the property or method becomes public. It means that you can access the property and method from both inside and outside of the class.
 
-In the next example we have added access modifiers to two functions. Here, if you try to call the set_color() or the set_type() function it will result in a fatal error (because the two functions are considered protected and private), even if all the properties are public:
+The following example illustrates the `public` access modifier:
 
 ```php
-class Car{  
-	private $brand;  
-	private $color;  
-	private $type;  
-	  
-	function set_name($brand) { // a public function (default)  
-		$this->brand = $brand;  
-	}  
-	protected function set_color($color) { // a protected function  
-		$this->color = $color;  
-	}  
-	private function set_type($type) { // a private function  
-		$this->type= $type;  
-	}  
-}  
-  
-$benz = new Car();  
-$benz->set_brand('benz'); // OK  
-$benz->set_color('yellow'); // ERROR  
-$benz->set_type('sedan'); // ERROR
+class Customer {
+	public $name;
+
+	public function get_name() {
+		return $this->name;
+	}
+}
 ```
+In this example, the `Customer` class has a `public` property (`$name`) and `public` method (`get_name()`). And you can access the property and method from both inside and outside of the class. For example:
+
+```php
+$customer = new Customer();
+$customer->name = 'Sohrab';
+echo $customer->get_name(); // Sohrab
+```
+How it works.
+
+### The private access modifier
+To prevent access to properties and methods from outside of the class, you use the `private` access modifier. The following example changes `$name` property of the `Customer` class from `public` to `private`:
+
+```php
+class Customer {
+	private $name;
+}
+```
+
+If you attempt to access the `$name` property from the outside of the class, you’ll get an error. For example:
+
+```php
+$customer = new Customer();
+$customer->name = 'Sohrab';
+```
+
+Error:
+`Fatal error: Uncaught Error: Cannot access private property Customer::$name`
+
+So how do you access a `private` property?
+
+To manipulate the value of a private property, you need to define a public method and use the method to manage the private property.
+
+Typically, you need to define two kinds of public methods to manage a private property:
+
+-   A getter returns the value of the private property.
+-   A setter sets a new value for the private property.
+
+By convention, the getter and setter have the following name:
+
+```php
+get_property
+set_property
+```
+
+The following `Customer` class defines the getter (`get_name`) and setter(`set_name)` to get and set the value of the `$name` property:
+
+```php
+class Customer {
+	private $name;
+
+	public function set_name($name) {
+		$this->name = $name;
+	}
+
+	public function get_name() {
+		return $this->name;
+	}
+}
+```
+
+And the following shows how to use the `set_name()` and `get_name()` methods to set and get the value of the `$name` property:
+
+```php
+$customer = new Customer();
+$customer->set_name('Sohrab');
+echo $customer->get_name();
+```
+
+### Why do you need private property?
+It may be quicker to use the `public` access modifier for properties instead of using a private property with the public getter/setter.
+
+However, by using the `private` the property, you can prevent direct access to the property from the outside of the class.
+
+In addition, the getter/setter methods ensure that the only way to access the property is through these methods. And the getter/setter methods can provide custom logic to manipulate the property value.
+
+For example, if you want the value of the `$name` property to be not blank, you can add the validation logic to the `set_name()` method as follows:
+
+```php
+
+class Customer {
+	private $name;
+
+	public function set_name($name) {
+		$name = trim($name);
+
+		if ($name == '') {
+			return false;
+		}
+		$this->name = $name;
+		return true;
+	}
+
+	public function get_name() {
+		return $this->name;
+	}
+}
+
+$customer = new Customer();
+$customer->set_name(' Sohrab ');
+echo $customer->get_name();
+```
+
+In the `setName()` method:
+
+-   First, remove all leading and trailing whitespace using the `trim()` function.
+-   Second, return false if the `$name` argument is blank. Otherwise, assign it to the `$name` property and return `true`.
+
+
+**Encapsulation** is one of the fundamentals of OOP (object-oriented programming). It refers to the bundling of data with the methods that operate on that data. Encapsulation is used to hide the values or state of a structured data object inside a class, preventing unauthorized parties’ direct access to them. Publicly accessible methods are generally provided in the class (so-called getters and setters) to access the values, and other client classes call these methods to retrieve and modify the values within the object
+
+![enter image description here](https://raw.githubusercontent.com/gitmag-group-admin/oop_php/main/04.jpg)
 
 ## Constructor
 
@@ -288,35 +364,36 @@ We see in the example below, that using a constructor saves us from calling the 
 ```php
 class Car{  
 	private $brand;  
-	private $color;  
   
-	function __construct($brand) {  
+	public function set_brand($brand) {  
 		$this->brand = $brand;  
 	}  
-	function get_brand() {  
+	public function get_brand() {  
 		return $this->brand;  
 	}  
 }  
   
-$volvo = new Car("volvo");  
-echo $volvo->get_brand();
+$benz = new  Car();
+$benz->set_brand('benz');
+echo $benz->get_brand();
 ```
 
-Another example:
+with `constructor`:
 
 ```php
-class Fruit {  
+class Car {  
 	private $brand;  
 	private $color;  
 	  
-	function __construct($brand, $color) {  
+	public function __construct($brand, $color)
+	{  
 		$this->brand= $brand;  
 		$this->color = $color;  
 	}  
-	function get_brand() {  
+	public function get_brand() {  
 		return $this->brand;  
 	}  
-	function get_color() {  
+	public function get_color() {  
 		return $this->color;  
 	}  
 }  
@@ -341,19 +418,30 @@ The example below has a __construct() function that is automatically called when
 
 ```php
 class Car {  
-	private $brand;  
+private $brand;  
 	private $color;  
 	  
-	function __construct($brand) {  
+	public function __construct($brand, $color)
+	{  
 		$this->brand= $brand;  
+		$this->color = $color;  
 	}  
 	
+	public function get_brand() {  
+		return $this->brand;  
+	}  
+	
+	public function get_color() {  
+		return $this->color;  
+	}  
+
 	function __destruct() {  
-		echo "The fruit is {$this->brand}.";  
+		echo "\nThe car is {$this->brand}.\n";  
 	}  
 }  
   
 $car = new Car("barnd");
+echo $benz->get_name();
 ```
 
 > **Tip:** As constructors and destructors helps reducing the amount of code, they are very useful!
@@ -364,6 +452,8 @@ $car = new Car("barnd");
 
 Inheritance in OOP = When a class derives from another class.
 The child class will inherit all the public and protected properties and methods from the parent class. In addition, it can have its own properties and methods.
+
+![enter image description here](https://raw.githubusercontent.com/gitmag-group-admin/oop_php/main/05.png)
 
 An inherited class is defined by using the `extends` keyword.
 Let's look at an example:
