@@ -450,12 +450,13 @@ echo $benz->get_name();
 
 ### What is Inheritance?
 
-Inheritance in OOP = When a class derives from another class.
-The child class will inherit all the public and protected properties and methods from the parent class. In addition, it can have its own properties and methods.
+In inheritance, you have a **parent** class with properties and methods, and a **child** class can use the code from the parent class.
+
+Inheritance allows you to write the code in the parent class and use it in both parent and child classes.
+
+The parent class is also called a base class or super class. And the child class is also known as a derived class or a subclass.
 
 ![enter image description here](https://raw.githubusercontent.com/gitmag-group-admin/oop_php/main/05.png)
-
-An inherited class is defined by using the `extends` keyword.
 Let's look at an example:
 
 ```php
@@ -479,8 +480,28 @@ class Car{
 		return $this->color;  
 	}  
 }  
-  
-// Strawberry is inherited from Fruit  
+```
+To declare that the `Bmw`  inherits from the `Car`, you use the `extends` keyword as follows:
+
+```php
+class Bmw extends Car {
+	// properties and methods
+}
+```
+In this example, the `Bmw` can reuse all the non-private properties and methods from the `Car` class.
+```php
+$bmw = new Bmw();
+$bmw->set_brand('bmw');
+$bmw->set_color('red');
+echo $bmw ->get_brand();
+echo "\n";
+echo $bmw ->get_color();
+```
+
+### Add properties and methods to the child class
+A child class can have its own properties and methods. In the following example, we add the `$model` property , `set_model()` and  `get_model`  methods to the `Bmw` class:
+
+```php
 class Bmw extends Car {  
 	private $model; 
 	
@@ -489,9 +510,14 @@ class Bmw extends Car {
 	}  
 	public function get_model() {  
 		return $this->model;  
+	} 
+	public function get_name() {  
+		return $this->get_brand() . $this->model;  
 	}  
 }  
+```
 
+```php
 $bmw = new Bmw();  
 
 $bmw->set_model("x6");
@@ -499,10 +525,10 @@ echo $bmw->get_model();
 echo "\n";
 $bmw->set_name("bmw");
 $bmw->set_brand("red");
-echo $bmw->get_brand();
+echo $bmw->get_name();
 ```
 
-#### How to Call the Parent Constructor
+### How to Call the Parent Constructor
 in this tutorial, you’ll learn how to call the parent constructor from the constructor of the child class.
 ```php
 class Car{  
@@ -522,17 +548,18 @@ class Car{
 		return $this->color;  
 	}  
 }  
-  
-// Strawberry is inherited from Fruit  
+
 class Bmw extends Car {  
 	private $model; 
 	
 	public function set_model($model) {  
 		$this->model = $model;  
 	}  
-	
 	public function get_model() {  
 		return $this->model;  
+	} 
+	public function get_name() {  
+		return $this->get_brand() . $this->model;  
 	}  
 }  
 
@@ -541,9 +568,11 @@ $bmw->set_model("x6");
 echo $bmw->get_model();  
 echo "\n";
 echo $bmw->get_brand();
+echo "\n";
+echo $bmw->get_name();
 ```
 
-#### Define a constructor in the child class
+### Define a constructor in the child class
 A child class can have its own constructor. For example, you can add a constructor to the `Bmw` class as follows:
 
 ```php
@@ -565,31 +594,35 @@ class Car{
 	}  
 }  
   
-// Strawberry is inherited from Fruit  
 class Bmw extends Car {  
 	private $model; 
 
 	public function __construct($brand, $color, $model) {  
-		parent::__construct($brand, $color);
+		// parent::__construct($brand, $color);
 		$this->brand = $brand;  
 	} 
 	
 	public function get_model() {  
 		return $this->model;  
-	}  
+	} 
+	
+	public function get_name() {  
+		return $this->get_brand() . $this->model;  
+	} 
 }  
 
 $bmw = new Bmw("bmw", "red", "x6");  
-
 echo $bmw->get_model();  
 echo "\n";
 echo $bmw->get_brand();
+echo "\n";
 echo $bmw->get_name();
 ```
 -   The constructor of the child class doesn’t automatically call the constructor of its parent class.
 -   Use `parent::__construct(arguments)` to call the parent constructor from the constructor in the child class.
 
 ### Inheritance and the Protected Access Modifier
+
 
 The `protected` properties and methods can be accessed from the inside of the class and any class that extends the class.
 
@@ -606,15 +639,15 @@ class Customer {
 	}
 }
 
-class VIP extends Customer {
-	public function getFormattedName(){
+class Vip extends Customer {
+	public function get_formatted_name(){
 		return ucwords($this->name);
 	}
 }
 
 
-$sohrab = new VIP('sohrab');
-echo $sohrab->getFormattedName();
+$sohrab = new Vip('sohrab');
+echo $sohrab->get_formatted_name();
 ```
 Since `$name` property is private, you can only access it within the `Customer` class. To allow the child class to access the `$name` property, you can change it to a protected property like this:
 
@@ -627,15 +660,15 @@ class Customer {
 	}
 }
 
-class VIP extends Customer {
-	public function getFormattedName(){
+class vip extends Customer {
+	public function get_formatted_name(){
 		return ucwords($this->name);
 	}
 }
 
 
-$sohrab = new VIP('sohrab');
-echo $sohrab->getFormattedName();
+$sohrab = new vip('sohrab');
+echo $sohrab->get_formatted_name();
 ```
 
 ### protected method example
@@ -652,24 +685,22 @@ class Customer {
 		return ucwords($this->name);
 	}
 
-	public function getName(){
-		return $this->format($this->name);
+	public function get_name(){
+		return $this->format();
 	}
 }
 
 class VIP extends Customer{
-	protected function format(){
-		return strtoupper($this->name);
+	public function get_formatted_name(){
+		return $this->format();
 	}
 }
 
 $sohrab = new Customer('sohrab azinfar');
-echo $sohrab->getName(); // sohrab azinfar
-
+echo $sohrab->get_name(); 
 echo "\n";
-
 $hossein = new VIP('hossein mohammadi');
-echo $hossein->getName(); // HOSSEIN MOHAMMADI
+echo $hossein->get_formatted_name();
 ```
 
 Use `protected` properties and methods can only be accessed within the class and in any child classes of the class.
@@ -806,11 +837,11 @@ Class constants are case-sensitive. However, it is recommended to name the const
 We can access a constant from outside the class by using the class name followed by the scope resolution operator (`::`) followed by the constant name, like here:
 
 ```php
-class Bmw{  
+class Database{  
 	const DATABASE_NAME = "test";  
 }  
   
-echo Bmw::DATABASE_NAME ;
+echo Database::DATABASE_NAME;
 ```
 
 Or, we can access a constant from inside the class by using the `self` keyword followed by the scope resolution operator (`::`) followed by the constant name, like here:
@@ -820,135 +851,145 @@ class Database{
 	const DATABASE_NAME = "test";  
 
 	public function connect() {  
-		echo "connected to " . self::DATABASE_NAME . "database";  
+		echo "connected to " . self::DATABASE_NAME . " database";  
 	}
 }  
 ```
 
 ## Abstract Classes
 
-### What are Abstract Classes and Methods?
 
-Abstract classes and methods are when the parent class has a named method, but need its child class(es) to fill out the tasks.
-An abstract class is a class that contains at least one abstract method. An abstract method is a method that is declared, but not implemented in the code.
-An abstract class or method is defined with the `abstract` keyword:
+### Introduction to the PHP abstract class
+An abstract class is a class that cannot be instantiated. Typically, an abstract defines an interface for other classes to extend.
+
+To define an abstract class, you add the `abstract` keyword as follows:
 
 ```php
-abstract class ParentClass {  
-	abstract public function someMethod1();  
-	abstract public function someMethod2($name, $color);  
-	abstract public function someMethod3() : string;  
+abstract class className {
+   // ...
 }
 ```
 
-When inheriting from an abstract class, the child class method must be defined with the same name, and the same or a less restricted access modifier. So, if the abstract method is defined as protected, the child class method must be defined as either protected or public, but not private. Also, the type and number of required arguments must be the same. However, the child classes may have optional arguments in addition.
+An abstract class can have properties and methods as a regular class. But it cannot be instantiated.
 
-So, when a child class is inherited from an abstract class, we have the following rules:
--   The child class method must be defined with the same name and it redeclares the parent abstract method
--   The child class method must be defined with the same or a less restricted access modifier
--   The number of required arguments must be the same. However, the child class may have optional arguments in addition
-
-Let's look at an example:
+Similar to an abstract class, an abstract method is a method that does not have an implementation. To define an abstract method, you also use the `abstract` keyword before the method signature like this
 
 ```php
-// Parent class  
-abstract class Car {  
-	protected $brand; 
-	protected $color;  
-	
-	public function __construct($brand, $color) {  
-		$this->barnd = $brand; 
-		$this->color = $color;  
-	}  
-	
-	abstract public function intro() : string;  
-}  
-  
-// Child classes  
-class Audi extends Car {  
-	public function intro() : string {  
-		return "Choose German quality! I'm an $this->brand!\n";  
-	}  
-}  
-  
-class Volvo extends Car {  
-	public function intro() : string {  
-	return "Proud to be Swedish! I'm a $this->brand!\n";  
-	}  
-}  
-  
-class Citroen extends Car {  
-	public function intro() : string {  
-		return "French extravagance! I'm a $this->brand!\n";  
-	}  
-}  
-  
-// Create objects from the child classes  
-$audi = new audi("audi", "white");  
-echo $audi->intro();  ;  
-  
-$volvo = new volvo("Volvo", "red");  
-echo $volvo->intro();    
-  
-$citroen = new citroen("Citroen", "green");  
-echo $citroen->intro();
+abstract function methodName(arguments);
 ```
 
-The Audi, Volvo, and Citroen classes are inherited from the Car class. This means that the Audi, Volvo, and Citroen classes can use the public $name property as well as the public __construct() method from the Car class because of inheritance.
+In most cases, an abstract class will contain at least one abstract method though it is not required. If a class contains one or more abstract methods, it must be an abstract class.
 
-But, intro() is an abstract method that should be defined in all the child classes and they should return a string.
+If a class extends an abstract class, it must implement all abstract methods or itself be declared abstract.
 
-### More Abstract Class Examples
-Let's look at another example where the abstract method has an argument, and the child class has two optional arguments that are not defined in the parent's abstract method:
+### PHP abstract class example
+The following example defines an abstract class called `Databae` that has an abstract method `connect()`:
+
+```php
+abstract class Database{
+	abstract public function connect();
+}
+```
+The following defines the `Mysql` class that extends the `connect` class. Since the `connect` class has the connect() abstract method, the `Mysql` class needs to implement the `connect()` method:
 
 ```php
 abstract class Database {
-	abstract public function connect($name);
+	abstract public function connect();
 }
 
 class Mysql extends Database {
-	protected function connect($name) {
-		echo "connected to $name database in Mysql.\n";
+	public function connect() {
+		echo "connected to mysql\n";
+	}
+}
+``` 
+
+The following creates a new instance of the `Mysql` class and call the `connect()` method:
+
+```php
+$mysql = new Mysql();
+$mysql->connect();
+```
+
+If you open the web browser:
+
+```php
+string(30) "connected to mysql!"
+```
+
+Later, if you want to dump the information to the command line, you can define a class e.g., `Sqlite` that extends the `Database` class:
+
+```php
+class Sqlite extends Database {
+	public function connect() {
+		echo "connected to sqlite\n";
+	}
+}
+```
+
+Put it all together:
+
+```php
+abstract class Database {
+	abstract public function connect();
+}
+
+class Mysql extends Database {
+	public function connect() {
+		echo "connected to mysql\n";
 	}
 }
 
 class Sqlite extends Database {
-	protected function connect($name) {
-		echo "connected to $name database in Sqlite.\n";
-	}
-}
-
-class SqlServer extends Database {
-	protected function connect($name) {
-		echo "connected to $name database in SqlServer.\n";
+	public function connect() {
+		echo "connected to sqlite\n";
 	}
 }
 
 $mysql = new Mysql();
-$mysql->connect('database_1');
+$mysql->connect();
 
 $sqlite = new Sqlite();
-$sqlite->connect('database_2');
-
-$sql_server = new SqlServer();
-$sql_server->connect('database_3');
+$sqlite->connect();
 ```
 
-## Interfaces
+## PHP Interface
 
-### What are Interfaces?
-
-Interfaces allow you to specify what methods a class should implement.
-Interfaces make it easy to use a variety of different classes in the same way. When one or more classes use the same interface, it is referred to as "polymorphism".
-Interfaces are declared with the `interface` keyword:
+### Introduction to the PHP interface
+An interface allows you to specify a contract that a class must implement. To define an interface, you use the `interface` keyword as follows:
 
 ```php
-interface InterfaceName {  
-	public function someMethod1();  
-	public function someMethod2($name, $color);  
-	public function someMethod3() : string;  
+interface MyInterface {
+	//...
+}
+``` 
+
+An interface consists of methods that contain no implementation. In other words, all methods of the interface are abstract methods. An interface can also include constants. For example:
+
+```php
+interface MyInterface {
+	public function methodName();
 }
 ```
+
+Note that all the methods in the interface must be public.
+
+When you define a class (child class) that reuses properties and methods of another class (parent class), the child class extends the parent class.
+However, for interfaces, we say that a class implements an interface.
+A class can inherit from one class only. Howeer, it can implement multiple interfaces.
+To define a class that implements an interface, you use the `implements` keyword as follows:
+
+```php
+interface MyInterface {
+	public function methodName();
+}
+
+class MyClass implements MyInterface {
+	public function methodName() {
+		// ...
+	}
+}
+``` 
 
 ### Using Interfaces
 To implement an interface, a class must use the `implements` keyword.
