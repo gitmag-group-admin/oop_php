@@ -1,3 +1,4 @@
+
 # OOP in PHP
 
  - What is OOP
@@ -1398,7 +1399,7 @@ class Gitmag extends Domain {
 }  
   
 $gitmag = new Gitmag();  
-echo $gitmag->websiteName
+echo $gitmag->websiteName;
 ```
 
 ### Static Properties
@@ -1475,150 +1476,351 @@ echo User::getTableName(); // User
 
 ## Magic Methods
 
-### __set()
+PHP magic methods are special methods in a class. The magic methods override the default actions when the object performs the actions.
 
-So we updated all the calls to `$this->name` to return `$this->username` but what about when we want to set that value, perhaps we have an account screen where users can change their name? Help is at hand in the form of the `__set` method, and easiest to illustrate with an example.
+By convention, the names of magic methods start with a double underscore (`__`). And PHP reserves the methods whose names start with a double underscore (`__`) for magic methods.
 
+So far, you have learned that the `constructor` and `destructor` use the `__construct()` and `__destruct()` methods. In fact, the `constructor` and `destructor` are also magic methods.
+
+The `__construct()` method is invoked automatically when an object is created and the `__destruct()` is called when the object is deleted.
+
+Besides the `__contruct()` and `__destruct()` methods, PHP also has the following magic methods:
+
+Magic Method
+
+`__call()`:	is triggered when invoking an inaccessible instance method
+`__callStatic()`:	is triggered when invoking an inaccessible static method
+`__get()`:	is invoked when reading the value from a non-existing or inaccessible property
+`__set()`:	is invoked when writing a value to a non-existing or inaccessible property
+`__isset()`:	is triggered by calling isset() or empty() on a non-existing or inaccessible property
+`__unset()`:	is invoked when unset() is used on a non-existing or inaccessible property.
+`__sleep()`:	The __sleep() commits the pending data
+`__wakeup()`:	is invoked when the unserialize() runs to reconstruct any resource that an object may have.
+`__serialize()`:	The serialize() calls __serialize(), if available, and construct and return an associative array of key/value pairs that represent the serialized form of the object.
+`__unserialize()`:	The unserialize() calls __unserialize(), if avaialble, and restore the properties of the object from the array returned by the __unserialize() method.
+`__toString()`:	is invoked when an object of a class is treated as a string.
+`__invoke()`:	is invoked when an object is called as a function
+`__set_state()`:	is called for a class exported by var_export()
+`__clone()`:	is called once the cloning is complete
+`__debugInfo()`:	is called by `var_dump()` when dumping an object to get the properties that should be shown.
+
+
+### __set() method
+When you attempt to write to a non-existing or inaccessible property, PHP calls the `__set()` method automatically. The following shows the syntax of the `__set()` method:
 
 ```php
-class Penguin extends Animal {
+public __set ( string $name , mixed $value ) : void
+```
 
-  public function __construct($id) {
-    $this->getPenguinFromDb($id);
-  }
+The `__set()` method accepts the name and value of the property that you write to. The following example illustrates how to use the `__set()` method:
 
-  public function getPenguinFromDb($id) {
-    // elegant and robust database code goes here
-  }
+```php
+class HtmlElement {
+	private $attributes = [];
 
-  public function __get($field) {
-    if($field == 'name') {
-      return $this->username;
+	private $tag;
+
+	public function __construct($tag) {
+		$this->tag = $tag;
+	}
+
+	public function __set($name, $value) {
+		$this->attributes[$name] = $value;
+	}
+
+	public function html($innerHTML = '') {
+		$html = "<" . $this->tag;
+		foreach ($this->attributes as $key => $value) {
+			$html .= ' ' . $key . '="' . $value . '"';
+		}
+		$html .= '>';
+		$html .= $innerHTML;
+		$html .= "</" . $this->tag . ">";
+
+		return $html;
+	}
+}
+```
+
+How it works.
+
+-   First, define the `HTMLElement` class that has only one property `$attributes`. It will hold all the attributes of the HTML element e.g., id and class.
+-   Second, initialize the constructor with a tag name. The tag name can be any string such as div, article, main, and section.
+-   Third, implement the `__set()` method that adds any property to the `$attribute` array.
+-   Fourth, define the `html()` method that returns the HTML representation of the element.
+
+The following uses the `HTMLElement` class and create a new div element:
+
+```php
+$div = new HtmlElement('div');
+
+$div->id = 'page';
+$div->class = 'light';
+
+echo $div->html('Hello');
+```
+
+Output:
+
+```php
+<div id="page" class="light">Hello</div>
+```
+
+The following code attempts to write to the non-existing property:
+
+```php
+$div->id = 'page';
+$div->class = 'light';
+```
+
+PHP calls the `__set()` method implictily and adds these properties to the `$attribute` property.
+
+### __get() method
+When you attempt to access a property that doesn’t exist or a property that is in-accessible e.g., private or protected property, PHP automatically calls the `__get()` method.
+
+The `__get()` method accepts one argument which is the name of the property that you want to access:
+
+```php
+public __get ( string $name ) : mixed
+```
+
+The following adds the `__get()` method to the `HTMLElement` class:
+
+```php
+class HtmlElement {
+	private $attributes = [];
+
+	private $tag;
+
+	public function __construct($tag) {
+		$this->tag = $tag;
+	}
+
+	public function __set($name, $value) {
+		$this->attributes[$name] = $value;
+	}
+
+	public function __get($name) {
+		if (array_key_exists($name, $this->attributes)) {
+			return $this->attributes[$name];
+		}
+	}
+
+  public function html($innerHTML = '') {
+		$html = "<" . $this->tag;
+		foreach ($this->attributes as $key => $value) {
+			$html .= ' ' . $key . '="' . $value . '"';
+		}
+		$html .= '>';
+		$html .= $innerHTML;
+		$html .= "</" . $this->tag . ">";
+
+		return $html;
+	}
+}
+```
+
+
+The `__get()` method checks if the requested property exists in the `$attributes` before returning the result.
+The following creates a new `article` element, sets the id and class attributes, and then shows the value of these attributes:
+
+```php
+$article = new HtmlElement('article');
+
+$article->id = 'main';
+$article->class = 'light';
+
+// show the attributes
+echo $article->class; // light
+echo $article->id; // main
+```
+### Introduction to the PHP __toString() method
+The `__toString()` is one of a magic method in PHP. The following shows the syntax of the `__toString()` method:
+
+```php
+public function __toString ( ) : string
+```
+
+The `__toString()` method accepts no parameter and returns a string.
+
+When you use an object as it were a string, PHP will automatically call the `__toString()` magic method. If the method doesn’t exist, PHP raises an error.
+
+The following example defines the `BankAccount` class, creates a new instance of the `BankAccount`, and display it:
+
+```php
+class BankAccount {
+	private $accountNumber;
+	private $balance;
+
+	public function __construct($accountNumber, $balance) {
+		$this->accountNumber = $accountNumber;
+		$this->balance = $balance;
+	}
+}
+
+$account = new BankAccount('123456789', 100);
+echo $account;
+```
+
+PHP raises the following error:
+
+```php
+PHP Fatal error:  Uncaught Error: Object of class BankAccount could not be converted to string...
+```
+
+To use the `$account` object as a string, you need to implement the `__toString()` method that returns the string representation of the `BankAccount` object. For example:
+
+```php
+class BankAccount {
+	private $accountNumber;
+	private $balance;
+
+	public function __construct($accountNumber, $balance) {
+		$this->accountNumber = $accountNumber;
+		$this->balance = $balance;
+	}
+
+	public function __toString() {
+		return "Bank Account: $this->accountNumber. Balance: $this->balance";
+	}
+}
+
+
+$account = new BankAccount('123456789', 100);
+echo $account;
+```
+
+In this example, the `__toString()` returns a string that contains the bank account number and its current balance. Here is the output:
+
+```php
+Bank Account: 123456789. Balance: $100
+```
+
+### Introduction to the PHP __call magic method
+The `__call()` method is invoked automatically when a non-existing method or inaccessible method is called. The following shows the syntax of the `__call()` method:
+
+```php
+public __call ( string $name , array $arguments ) : mixed
+```
+
+The `__call()` method accepts two arguments:
+
+-   `$name` is the name of the method that is being called by the object.
+-   `$arguments` is an array of arguments passed to the method call.
+
+The `__call()` method is useful when you want to create a wrapper class that wraps the existing API.
+
+### PHP __call() magic method example
+Suppose that you want to develop the `Str` class that wraps existing string functions such as `strlen()`, `strtoupp()`, `strtolower()`, etc.
+
+Typically, you can define the method explicitly like length, upper, lower, … But you can use utilize the `__call()` magic method to make the code shorter.
+
+The following defines the Str class that uses the `__call()` magic method:
+
+```php
+class Str {
+	private $string = '';
+
+	private $functions = [
+		'length' => 'strlen',
+		'upper' => 'strtoupper',
+		'lower' => 'strtolower'
+		// map more method to functions
+	];
+
+	public function __construct(string $string ) {
+		$this->string  = $string;
+	}
+
+	public function __call($method, $args) {
+		if (in_array($method, array_keys($this->functions))) {
+		  array_unshift($args, $this->string);
+			return call_user_func_array($this->functions[$method], $args);
+		}
+	}
+}
+```
+
+How it works.
+
+The `$functions` property store the mapping between the methods and built-in string function. For example, if you call the `length()` method, the `__call()` method will call the `strlen()` function.
+
+When you call a method on an object of the Str class and that method doesn’t exist e.g., `length()`, PHP will invoke the `__call()` method.
+
+The `__call()` method will raise a `BadMethodCallException` if the method is not supported. Otherwise, it’ll add the string to the argument list before calling the corresponding function.
+
+The following shows how to uses the `Str` class:
+
+```php
+$s = new Str('Hello, World!');
+
+echo $s->upper() . "\n"; // HELLO, WORLD!
+echo $s->lower() . "\n"; // hello, world!
+echo $s->length() . "\n"; // 13
+``` 
+Output:
+
+```php
+HELLO, WORLD!
+hello, world!
+13
+```
+
+### Introduction to the PHP __callStatic() magic method
+PHP invokes the `__callStatic()` method when you invoke an inaccessible static method of a class
+
+The following shows the syntax of the `__callStatic()` method:
+
+```php
+public static __callStatic(string $name, array $arguments): mixed
+```
+
+The `__callStatic()` has two parameters: `$name` and `$arguments`.
+
+When you call an inaccessible static method of a class, PHP will automatically invoke the `__callStatic()` method with the following arguments:
+
+-   `$name` is the static method name.
+-   `$arguments` is an array of arguments.
+
+### PHP __callStatic() magic method example
+The following example defines a class called `Str`:
+
+```php
+
+class Str {
+    private static $methods = [
+        'upper' => 'strtoupper',
+        'lower' => 'strtolower',
+        'len' => 'strlen'
+    ];
+
+    public static function __callStatic(string $method, array $parameters) {
+        if (array_key_exists($method, self::$methods)) {
+	        return call_user_func_array(self::$methods[$method], $parameters);
+        }
     }
-  }
-
-  public function __set($field, $value) {
-    if($field == 'name') {
-      $this->username = $value;
-    }
-  }
 }
+
+echo Str::lower('Hello') . "\n";
+echo Str::upper('Hello') . "\n";
+echo Str::len('Hello') . "\n";
 ```
 
-In this way we can falsify properties of objects, for any one of a number of uses. As I said, not a way to build a whole system, but a very useful trick to know.
-
-### __get()
-
-This next magic method is a very neat little trick to use - it makes properties which actually don't exist appear as if they do. Let's take our little penguin:
+Output:
 
 ```php
-class Penguin extends Animal {
-
-  public function __construct($id) {
-    $this->getPenguinFromDb($id);
-  }
-  public function getPenguinFromDb($id) {
-    // elegant and robust database code goes here
-  }
-}
-```
-Now if our penguin has the properties "name" and "age" after it is loaded, we'd be able to do:
-
-```php
-$tux = new Penguin(3);
-echo $tux->name . " is " . $tux->age . " years old\n";
-```
-However imagine something changed about the backend database or information provider, so instead of "name", the property was called "username". And imagine this is a complex application which refers to the "name" property in too many places for us to change. We can use the `__get` method to pretend that the "name" property still exists:
-
-```php
-class Penguin extends Animal {
-
-  public function __construct($id) {
-    $this->getPenguinFromDb($id);
-  }
-
-  public function getPenguinFromDb($id) {
-    // elegant and robust database code goes here
-  }
-
-  public function __get($field) {
-    if($field == 'name') {
-      return $this->username;
-    }
-}
-```
-This technique isn't really a good way to write whole systems, because it makes code hard to debug, but it is a very valuable tool. It can also be used to only load properties on demand or show calculated fields as properties, and a hundred other applications that I haven't even thought of!
-
-### __call()
-
-There are actually two methods which are similar enough that they don't get their own title in this post! The first is the `__call` method, which gets called, if defined, when an undefined method is called on this object. The second is `__callStatic` which behaves in exactly the same way but responds to undefined static method calls instead (this was added in PHP 5.3). Probably the most common thing I use `__call` for is polite error handling, and this is especially useful in library code where other people might need to be integrating with your methods. So for example if a script had a Penguin object called $penguin and it contained `$penguin->speak()` ... the `speak()` method isn't defined so under normal circumstances we'd see:
-
-```php
-PHP Fatal error: Call to undefined method Penguin::speak() in ...
+hello
+HELLO
+5
 ```
 
-What we can do is add something to cope more nicely with this kind of failure than the PHP fatal error you see here, by declaring a method `__call`. For example:
+How it works.
 
-```php
-class Animal {
-}
-class Penguin extends Animal {
+The Str class a private static property called `$methods`. It’s an array that holds the mapping of the method name and built-in string functions.
 
-  public function __construct($id) {
-    $this->getPenguinFromDb($id);
-  }
+When you call a static method that doesn’t exist on the Str class, PHP automatically invokes the `__callStatic()` magic method.
 
-  public function getPenguinFromDb($id) {
-    // elegant and robust database code goes here
-  }
-
-  public function __get($field) {
-    if($field == 'name') {
-      return $this->username;
-    }
-  }
-
-  public function __set($field, $value) {
-    if($field == 'name') {
-      $this->username = $value;
-    }
-  }
-
-  public function __call($method, $args) {
-      echo "unknown method " . $method;
-      return false;
-  }
-}
-```
-
-This will catch the error and echo it. In a practical application it might be more appropriate to log a message, redirect a user, or throw an exception, depending on what you are working on - but the concept is the same. Any misdirected method calls can be handled here however you need to, you can detect the name of the method and respond differently accordingly - for example you could handle method renaming in a similar way to how we handled the property renaming above.
-
-### __toString()
-
-Definitely saving the best until last, the `__toString` method is a very handy addition to our toolkit. This method can be declared to override the behaviour of an object which is output as a string, for example when it is echoed. For example if you wanted to just be able to echo an object in a template, you can use this method to control what that output would look like. Let's look at our Penguin again:
-
-```php
-class Penguin {
-
-  public function __construct($name) {
-      $this->species = 'Penguin';
-      $this->name = $name;
-  }
-
-  public function __toString() {
-      return $this->name . " (" . $this->species . ")\n";
-  }
-}
-```
-
-With this in place, we can literally output the object by calling echo on it, like this:
-
-```php
-$tux = new Penguin('tux');
-echo $tux;
-```
-
-I don't use this shortcut often but it's useful to know that it is there.
+The `__callStatic()` checks if the static method name is supported by looking up the keys of the `$methods` array. It’ll throw an Exception if the method is not in the keys of the `$methods` array. Otherwise, the `__callStatic()` method will call the corresponding string function.
 
 ## Working with Objects
 
